@@ -1,5 +1,10 @@
 const hre = require("hardhat");
 
+// ✅ Set your parameters here
+const TOTAL_SUPPLY = "1000000";      // Total MTK tokens
+const PRESALE_SUPPLY = "500000";     // Amount sent to presale
+const TOKEN_PRICE_ETH = "0.001";     // Price per token in ETH
+
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
   console.log("🚀 Deploying contracts with:", deployer.address);
@@ -7,20 +12,20 @@ async function main() {
 
   // 1️⃣ Deploy MTKToken
   const MTKToken = await hre.ethers.getContractFactory("MTKToken");
-  const token = await MTKToken.deploy(hre.ethers.utils.parseEther("1000000")); // 1,000,000 MTK
+  const token = await MTKToken.deploy(hre.ethers.utils.parseEther(TOTAL_SUPPLY));
   await token.deployed();
   console.log("✅ MTKToken deployed at:", token.address);
 
   // 2️⃣ Deploy MTKPresale
   const MTKPresale = await hre.ethers.getContractFactory("MTKPresale");
-  const presale = await MTKPresale.deploy(token.address, hre.ethers.utils.parseEther("0.001")); 
+  const presale = await MTKPresale.deploy(token.address, hre.ethers.utils.parseEther(TOKEN_PRICE_ETH));
   await presale.deployed();
   console.log("✅ MTKPresale deployed at:", presale.address);
 
   // 3️⃣ Transfer tokens to presale contract
-  const tx = await token.transfer(presale.address, hre.ethers.utils.parseEther("500000")); // 50% supply
+  const tx = await token.transfer(presale.address, hre.ethers.utils.parseEther(PRESALE_SUPPLY));
   await tx.wait();
-  console.log("📤 Sent 500,000 MTK to Presale contract");
+  console.log(`📤 Sent ${PRESALE_SUPPLY} MTK to Presale contract`);
 }
 
 main().catch((error) => {
